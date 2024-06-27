@@ -1,0 +1,26 @@
+services:
+  mapasbackend:
+    build: .
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - PORT=${PORT}
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+  mysqldb:
+    image: mysql:8.3
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    restart: always
+    environment: 
+      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      interval: 10s
+      retries: 10
